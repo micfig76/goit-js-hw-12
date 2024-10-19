@@ -15,7 +15,7 @@ const main = () => {
       event.preventDefault();
       const form = event.target;
       const searchQuery = form.elements['query'].value;
-      form.removeEventListener();
+      form.reset();
 
       query = searchQuery;
       await gallery.loadPhotos(searchQuery);
