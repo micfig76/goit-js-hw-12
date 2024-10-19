@@ -14,9 +14,9 @@ export class Gallery {
     this.#loadMoreButton = loadMoreButton;
   }
 
-  async loadPhotos(searchQuery) {
+  async loadPhotos(searchQuery, page) {
     this.#loader.show();
-    const data = await getPhotos(searchQuery);
+    const data = await getPhotos(searchQuery, page);
     console.log(data);
 
     if (data.hits.length === 0) {
@@ -38,8 +38,20 @@ export class Gallery {
     this.#lightbox.refresh();
 
     this.#loader.hide();
+
+    const morePhotos = 40 < data.totalHits;
+    if (morePhotos) {
+      this.#loadMoreButton.show();
+    } else {
+      iziToast.info({
+        message:
+          'Sorry, there are no images matching your search. Please try again later',
+        position: 'topRight',
+      });
+    }
   }
 }
+
 const toGalleryPhoto = ({
   webformatURL,
   largeImageURL,

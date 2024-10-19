@@ -8,6 +8,7 @@ const main = () => {
 
   const gallery = new Gallery('.gallery', lightbox, loader, loadMoreButton);
   let query;
+  let page = 1;
 
   document
     .querySelector('form#image-search')
@@ -18,12 +19,16 @@ const main = () => {
       form.reset();
 
       query = searchQuery;
-      await gallery.loadPhotos(searchQuery);
+      page = 1;
+      await gallery.loadPhotos(searchQuery, page);
     });
-
-  loadMoreButton
-    .getElement()
-    .addEventListener('click', () => gallery.loadPhotos(query));
+  const dupa = loadMoreButton.getElement();
+  console.log(dupa);
+  loadMoreButton.getElement().addEventListener('click', async () => {
+    console.log(loadMoreButton);
+    page++;
+    await gallery.loadPhotos(query, page);
+  });
 };
 
 main();
