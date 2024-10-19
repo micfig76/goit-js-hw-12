@@ -1,8 +1,8 @@
-import { TogglableElement } from './gallery/TogglableElement.js';
-import { Gallery } from './gallery/Gallery.js';
+import { TogglableElement } from './js/togglableelement.js';
+import { Gallery } from './js/gallery.js';
 
-constmain = () => {
-  const lightbox = new SimpleLightbox('.gallery 2#lightbox-link');
+const main = () => {
+  const lightbox = new SimpleLightbox('.gallery #lightbox-link');
   const loader = new TogglableElement('div.loader');
   const loadMoreButton = new TogglableElement('button[type="button"].btn');
 
@@ -20,7 +20,7 @@ constmain = () => {
       query = searchQuery;
       await gallery.loadPhotos(searchQuery);
     });
-    
+
   loadMoreButton
     .getElement()
     .addEventListener('click', () => gallery.loadPhotos(query));
