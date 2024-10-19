@@ -20,14 +20,18 @@ const main = () => {
 
       query = searchQuery;
       page = 1;
+
       await gallery.loadPhotos(searchQuery, page);
     });
-  const dupa = loadMoreButton.getElement();
-  console.log(dupa);
+
   loadMoreButton.getElement().addEventListener('click', async () => {
-    console.log(loadMoreButton);
     page++;
     await gallery.loadPhotos(query, page);
+
+    const height = document
+      .querySelector('.card')
+      .getBoundingClientRect().height;
+    scrollBy(0, 2 * height, { behavior: 'smooth' });
   });
 };
 

@@ -6,6 +6,7 @@ export class Gallery {
   #lightbox;
   #loader;
   #loadMoreButton;
+  #cards = [];
 
   constructor(selector, lightbox, loader, loadMoreButton) {
     this.#element = document.querySelector(selector);
@@ -15,39 +16,53 @@ export class Gallery {
   }
 
   async loadPhotos(searchQuery, page) {
-    this.#loader.show();
-    const data = await getPhotos(searchQuery, page);
-    console.log(data);
-
-    if (data.hits.length === 0) {
-      iziToast.error({
-        message:
-          'Sorry, there are no images matching your search. Please try again later',
-        position: 'topRight',
-      });
-      this.#element.replaceChildren();
-      return;
+    if (page === 1) {
+      this.#cards = [];
     }
+    this.#loadMoreButton.hide();
+    this.#loader.show();
 
-    const cards = data.hits
-      .map(toGalleryPhoto)
-      .map(createCard)
-      .map(card => applyLightbox(card, this.#lightbox));
+    try {
+      const data = await getPhotos(searchQuery, page);
 
-    this.#element.replaceChildren(...cards);
-    this.#lightbox.refresh();
+      if (data.hits.length === 0) {
+        iziToast.error({
+          message:
+            'Sorry, there are no images matching your search. Please try again later',
+          position: 'topRight',
+        });
+        this.#element.replaceChildren();
+        return;
+      }
 
-    this.#loader.hide();
+      this.#cards.push(...data.hits);
+      const cards = this.#cards
+        .map(toGalleryPhoto)
+        .map(createCard)
+        .map(card => applyLightbox(card, this.#lightbox));
 
-    const morePhotos = 40 < data.totalHits;
-    if (morePhotos) {
-      this.#loadMoreButton.show();
-    } else {
-      iziToast.info({
-        message:
-          'Sorry, there are no images matching your search. Please try again later',
+      this.#element.replaceChildren(...cards);
+      this.#lightbox.refresh();
+
+      this.#loader.hide();
+
+      const morePhotos = this.#cards.length < data.totalHits;
+      if (morePhotos) {
+        this.#loadMoreButton.show();
+      } else {
+        iziToast.info({
+          message:
+            'Sorry, there are no images matching your search. Please try again later',
+          position: 'topRight',
+        });
+      }
+    } catch (error) {
+      iziToast.error({
+        message: 'Sorry, couldn`t load images. Please try again later',
         position: 'topRight',
       });
+    } finally {
+      this.#loader.hide();
     }
   }
 }
